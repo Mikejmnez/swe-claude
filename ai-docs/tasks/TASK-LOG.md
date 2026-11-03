@@ -21,11 +21,11 @@ needed).
 *(delete this section once you've seen the shape)*
 
 **Category:** Test Coverage
-**Status:** In Progress
+**Status:** Plan Ready
 **Created:** YYYY-MM-DD
 **Related requirements/constraints:** None found — `parser/` predates FR/NFR/UC
 tracking in this repo
-**Plan:** `plans/task-parser-test-coverage-plan.md`
+**Plan:** `ai-plans/task-parser-test-coverage-plan.md`
 
 **Scope:** Every public function in `parser/`, tested against the fixtures already
 in `parser/testdata/`. Does not include refactoring the module itself, even where
@@ -43,7 +43,7 @@ the last quarter that tests would have caught before merge.
 **Created:** 2026-11-03
 **Related requirements/constraints:** None found. The requirement, constraint and
 decision docs hold only `_EXAMPLE_` entries.
-**Plan:** `plans/task-ai-dir-prefix-plan.md` (moves to `ai-plans/` as part of this task)
+**Plan:** `ai-plans/task-ai-dir-prefix-plan.md`
 
 **Scope:** `git mv` this repo's `docs/` → `ai-docs/` and `plans/` → `ai-plans/`.
 Rewrite every `docs/` and `plans/` path reference in `CLAUDE.md`, `CLAUDE-bes.md`,

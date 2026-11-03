@@ -1,7 +1,7 @@
 # Task Plan: Rename `docs/` and `plans/` to `ai-docs/` and `ai-plans/`
 
 **Task:** TASK-001
-**Status:** Draft
+**Status:** In Progress
 **Created:** 2026-11-03
 
 ## Summary
@@ -22,7 +22,7 @@ everywhere, and deletes the fallback code.
 
 ## Related requirements / constraints
 
-None. `docs/requirements/`, `docs/constraints/` and `docs/decisions/` hold only
+None. `ai-docs/requirements/`, `ai-docs/constraints/` and `ai-docs/decisions/` hold only
 `_EXAMPLE_` entries.
 
 ## Scope

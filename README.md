@@ -16,7 +16,7 @@ the system should do, and will the plan say which requirement each step satisfie
 
 ```
 CLAUDE.md                                   # rules Claude reads every session
-docs/
+ai-docs/
   requirements/
     functional-requirements.md              # FR-001, FR-002, ...
     non-functional-requirements.md          # NFR-001, ...
@@ -31,7 +31,7 @@ docs/
     TASK-LOG.md                              # TASK-001, ... — scoped maintenance/engineering work
   deep-dives/
     README.md                                # convention note; one file per investigation
-plans/
+ai-plans/
   _template-plan.md                          # shape every generated feature plan follows
   _template-bugfix.md                        # shape every generated bugfix plan follows
   _template-task.md                          # shape every generated task plan follows
@@ -51,7 +51,7 @@ plans/
 ```
 
 Every requirement, use case, and constraint gets a stable ID (`FR-001`, `NFR-014`,
-`UC-003`, `IC-002`). Plans in `plans/` cite those IDs on every phase. `/trace` and
+`UC-003`, `IC-002`). Plans in `ai-plans/` cite those IDs on every phase. `/trace` and
 `/audit-plan` exist so that "does anything actually cover this?" and "did this plan
 wander off scope?" are one command away instead of a manual grep.
 
@@ -72,7 +72,7 @@ broken build.
 **`/deep-dive` is a standalone, read-only investigation command** for understanding
 existing code — onboarding to an unfamiliar module, answering "how does X work,"
 or checking whether the code still matches what the requirement docs claim. Findings
-get saved to `docs/deep-dives/` so the same investigation doesn't happen twice.
+get saved to `ai-docs/deep-dives/` so the same investigation doesn't happen twice.
 `/plan-feature` and `/fix-bug` both hand off to it when what they need is more than a
 quick read-only look.
 
@@ -84,10 +84,10 @@ template** on the repo page (or `gh repo create my-project --template
 <you>/claude-swe-planning-template`) gives you a fresh copy with its own history for
 every new project.
 
-**Option B — copy into an existing repo.** Copy `CLAUDE.md`, `docs/`, `plans/`, and
+**Option B — copy into an existing repo.** Copy `CLAUDE.md`, `ai-docs/`, `ai-plans/`, and
 `.claude/` into a repo you already have (if it already has a `CLAUDE.md` or
 `.claude/settings.json`, merge rather than overwrite). Nothing in the core template
-assumes a particular language or stack — the `.claude/` folder and `docs/` folder are
+assumes a particular language or stack — the `.claude/` folder and `ai-docs/` folder are
 additive. Language-specific snippets (currently `arduino-platformio-conventions.md`,
 `cpp-conventions.md`, `java-conventions.md`, and `python-conventions.md`) are optional: paste the one you want into the Conventions section of `CLAUDE.md`. Run `/init-planning`
 afterward to seed the requirement docs from the existing codebase and an interview,
@@ -97,12 +97,12 @@ rather than starting from blank tables.
 
 1. Fill in `{{PROJECT_NAME}}`, `{{ONE_LINE_DESCRIPTION}}`, and `{{CONVENTIONS}}` in
    `CLAUDE.md` — or run `/init-planning` and let the interview do it.
-2. Delete the `_EXAMPLE_` rows in each `docs/requirements/*.md` and
-   `docs/constraints/*.md` file once you've seen the format — they're there to show
+2. Delete the `_EXAMPLE_` rows in each `ai-docs/requirements/*.md` and
+   `ai-docs/constraints/*.md` file once you've seen the format — they're there to show
    the table shape, not to be real requirements.
 3. Run `/new-requirement` a few times to populate real FRs/NFRs/UCs/ICs, or `/init-
    planning` to do it as one interview.
-4. Run `/plan-feature <something>` and check that the plan it writes to `plans/`
+4. Run `/plan-feature <something>` and check that the plan it writes to `ai-plans/`
    actually cites the IDs you just wrote.
 
 ## Design choices worth knowing about
