@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 # link-swe-claude.sh - symlink swe-claude's Claude scaffolding into another project.
 #
-# Usage: link-swe-claude.sh [-n] TARGET_DIR
-#   -n   dry run: report what would happen, change nothing
+# Usage: link-swe-claude.sh [-n] [-c FILE] TARGET_DIR
+#   -n        dry run: report what would happen, change nothing
+#   -c FILE   link this directory's FILE (default CLAUDE.md) as TARGET_DIR/CLAUDE.md,
+#             e.g. -c CLAUDE-bes.md
 #
 # Links .claude, docs, plans and CLAUDE.md from this directory into TARGET_DIR:
 #   docs, plans  if TARGET_DIR already has one, link it as ai-docs / ai-plans instead
 #   .claude      if TARGET_DIR already has one, report it and leave it alone
-#   CLAUDE.md    an existing CLAUDE.md is moved to CLAUDE.md.orig first
+#   CLAUDE.md    an existing CLAUDE.md is moved to CLAUDE.md.orig first; one that
+#                already links to a different CLAUDE file here is re-pointed
 # If TARGET_DIR is in a git work tree, the new names are added to that repo's
 # .git/info/exclude so they never show up in 'git status'.
 # Safe to re-run: links that already point here are left as they are.
@@ -20,7 +23,7 @@ set -u
 prog=$(basename "$0")
 SRC=$(cd "$(dirname "$0")" && pwd -P)
 
-usage() { echo "usage: $prog [-n] TARGET_DIR" >&2; exit 2; }
+usage() { echo "usage: $prog [-n] [-c FILE] TARGET_DIR" >&2; exit 2; }
 say()   { printf '%s\n' "$*"; }
 warn()  { printf '%s: %s\n' "$prog" "$*" >&2; }
 run()   { if [ "$dry_run" -eq 1 ]; then say "  (dry run) $*"; else "$@"; fi; }
@@ -31,15 +34,25 @@ exists() { [ -e "$1" ] || [ -L "$1" ]; }
 # is_our_link PATH NAME: true if PATH is a symlink to $SRC/NAME
 is_our_link() { [ -L "$1" ] && [ "$(readlink "$1")" = "$SRC/$2" ]; }
 
+# is_swe_link PATH: true if PATH is a symlink to anything in $SRC
+is_swe_link() { [ -L "$1" ] && case $(readlink "$1") in "$SRC"/*) true ;; *) false ;; esac; }
+
 dry_run=0
-while getopts n opt; do
+claude_md=CLAUDE.md
+while getopts nc: opt; do
     case $opt in
         n) dry_run=1 ;;
+        c) claude_md=$OPTARG ;;
         *) usage ;;
     esac
 done
 shift $((OPTIND - 1))
 [ $# -eq 1 ] || usage
+
+case $claude_md in
+    */*|"") warn "-c takes a file name in $SRC, not a path: $claude_md"; exit 1 ;;
+esac
+[ -f "$SRC/$claude_md" ] || { warn "no such file in $SRC: $claude_md"; exit 1; }
 
 TARGET=$(cd "$1" 2>/dev/null && pwd -P) || { warn "not a directory: $1"; exit 1; }
 [ "$TARGET" != "$SRC" ] || { warn "target is swe-claude itself"; exit 1; }
@@ -92,9 +105,22 @@ for name in docs plans; do
     fi
 done
 
-# CLAUDE.md: move an existing one aside, then link.
+# CLAUDE.md: re-point a link to another of our CLAUDE files, or move an
+# existing file aside, then link.
 c="$TARGET/CLAUDE.md"
-if exists "$c" && ! is_our_link "$c" CLAUDE.md; then
+if is_swe_link "$c" && ! is_our_link "$c" "$claude_md"; then
+    say "relink: CLAUDE.md was -> $(readlink "$c")"
+    if run rm "$c"; then
+        if [ "$dry_run" -eq 1 ]; then          # nothing really removed, so don't re-check
+            say "link: CLAUDE.md -> $SRC/$claude_md"
+            excludes="$excludes CLAUDE.md"
+        else
+            make_link "$claude_md" CLAUDE.md
+        fi
+    else
+        status=1
+    fi
+elif exists "$c" && ! is_our_link "$c" "$claude_md"; then
     if exists "$c.orig"; then
         warn "CLAUDE.md and CLAUDE.md.orig both exist in $TARGET; leaving both alone (CLAUDE.md NOT linked)"
         status=1
@@ -107,17 +133,17 @@ if exists "$c" && ! is_our_link "$c" CLAUDE.md; then
         if run mv "$c" "$c.orig"; then
             excludes="$excludes CLAUDE.md.orig"
             if [ "$dry_run" -eq 1 ]; then      # nothing really moved, so don't re-check
-                say "link: CLAUDE.md -> $SRC/CLAUDE.md"
+                say "link: CLAUDE.md -> $SRC/$claude_md"
                 excludes="$excludes CLAUDE.md"
             else
-                make_link CLAUDE.md CLAUDE.md
+                make_link "$claude_md" CLAUDE.md
             fi
         else
             status=1
         fi
     fi
 else
-    make_link CLAUDE.md CLAUDE.md
+    make_link "$claude_md" CLAUDE.md
 fi
 
 # Keep the links out of the project's git status.
