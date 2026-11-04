@@ -36,32 +36,6 @@ the last quarter that tests would have caught before merge.
 
 ---
 
-## TASK-001 — Rename `docs/` and `plans/` to `ai-docs/` and `ai-plans/`
-
-**Category:** Build/Tooling
-**Status:** In Progress
-**Created:** 2026-11-03
-**Related requirements/constraints:** None found. The requirement, constraint and
-decision docs hold only `_EXAMPLE_` entries.
-**Plan:** `ai-plans/task-ai-dir-prefix-plan.md`
-
-**Scope:** `git mv` this repo's `docs/` → `ai-docs/` and `plans/` → `ai-plans/`.
-Rewrite every `docs/` and `plans/` path reference in `CLAUDE.md`, `CLAUDE-bes.md`,
-`README.md`, every file under `.claude/`, and every file in the renamed directories.
-Change `link-swe-claude.sh` to always link them as `ai-docs` / `ai-plans` (drop the
-`docs`→`ai-docs` fallback and the closing "note:" message). Make the script migrate
-projects linked by the old version: remove symlinks that point at `$SRC/docs` or
-`$SRC/plans`, create the new links, and update `.git/info/exclude` to match.
-Not included: `Claude-outputs/prompt-audit/` (a historical record, left as-is), the
-`*-conventions.md` snippets (no references), and fixing links in projects that point
-at a swe-claude checkout other than the one the script runs from.
-
-**Motivation:** Most target projects already have their own `docs/` (and sometimes
-`plans/`), so the `ai-` prefix should be the default. A single fixed name also lets
-`CLAUDE.md` give correct paths in every project, and the fallback logic can go.
-
----
-
 <!-- Add new tasks via /plan-task, or by hand — keep the section format: metadata
      lines, then Scope / Motivation. Unlike a bug, a task doesn't need a symptom or
      reproduction — it needs a clear boundary of what's included and what isn't,
