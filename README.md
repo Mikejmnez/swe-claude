@@ -1,6 +1,6 @@
 # swe-claude
 
-NB: The branch jhrg/development is intended to use the tools in the repo to 
+NB: The branch mju/development is intended to use the tools in the repo to 
 maintain and extend it. Merge work done there to main and then _delete the 
 TASK-, BUG-, and new files in ai-pans and ai-docs_ unless they are actually
 intended for the template.

@@ -95,7 +95,7 @@ one all happen on that item's branch.
   them — don't layer new work on top of an already-dirty tree.
 - **One branch per item:** before the first edit, confirm whether an existing
   branch already covers this item or a new one is needed. Name new branches
-  `jhrg/<slug>`, matching the existing convention (e.g. `jhrg/sd-debug-log`) — a
+  `mju/<slug>` (e.g. `mju/python-min-version-policy`) — a
   short kebab-case description of the plan/task/bug, not the raw ID.
 - **Always ask before creating or switching branches** and confirm the name with
   the user first, even when the tree is clean — creating/switching branches

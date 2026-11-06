@@ -3,13 +3,20 @@
 
 ## Conventions — Python 3 (pyproject / pytest)
 
-**Stack:** Python `{{MIN PYTHON — e.g. 3.11}}`+ on Linux and macOS, packaged with
-`pyproject.toml`, tested with pytest. The minimum version is the baseline for both the
-language and the standard library; pick the oldest CPython still receiving security
-fixes that every deployment target actually has, and check before assuming. Features
+**Stack:** Python `{{MIN PYTHON — e.g. 3.11 as of 2026-11; re-derive from the rule below}}`+
+on Linux and macOS, packaged with `pyproject.toml`, tested with pytest. The minimum
+version is the baseline for both the language and the standard library, and it follows
+a fixed rule: **the oldest CPython branch with at least 6 months left before its
+end-of-life date**, per the status table at https://devguide.python.org/versions/. A
+scheduled end-of-life given only as a month (e.g. `2027-10`) counts from the first of
+that month. Check the table when the project starts and each April — CPython releases
+every October with a 5-year lifetime, so the baseline moves up one minor version a
+year, six months before the oldest supported branch reaches end of life. Holding the
+baseline below the rule because a deployment target lacks the required version is an
+exception recorded as an ADR, naming the target and when it will catch up. Features
 newer than the baseline are listed under **Version-gated features** below together with
 the baseline way to do the same thing. Interpreters/platforms:
-`{{INTERPRETERS & PLATFORMS — e.g. CPython 3.11–3.13 on Linux x86_64/aarch64 and macOS arm64}}`.
+`{{INTERPRETERS & PLATFORMS — e.g. CPython 3.11–3.14 on Linux x86_64/aarch64 and macOS arm64}}`.
 Environment/dependency tool: `{{TOOL — e.g. uv, or pip + venv with pip-tools}}`.
 
 ### Packaging & layout
@@ -87,13 +94,15 @@ Environment/dependency tool: `{{TOOL — e.g. uv, or pip + venv with pip-tools}}
 - Syntax and stdlib APIs newer than the baseline are off-limits (ruff and the type
   checker, targeted at the baseline, flag most of them). Don't route around the
   baseline with `sys.version_info` branches or `try: import ...` fallbacks except in
-  one compat module with a test for each branch. If a newer feature is truly needed,
-  raising the baseline is a decision to record as an ADR.
+  one compat module with a test for each branch. The scheduled April bump (see
+  **Stack**) is a routine `TASK-###`; raising the baseline *beyond* the rule because a
+  newer feature is truly needed is a decision to record as an ADR.
 
 ### Version-gated features
 
 Raising the baseline is one change: bump `requires-python`, ruff `target-version`, mypy
-`python_version`, the CI interpreter matrix, and the lock file, then record an ADR.
+`python_version`, the CI interpreter matrix, and the lock file. Log it as a `TASK-###`
+when it follows the rule in **Stack**, or record an ADR when it departs from the rule.
 Nothing in a row is allowed until the baseline is at or above that row's version. After
 the baseline moves, prefer the newer form in new code; existing code is converted only
 when touched for another reason, or as a `TASK-###` (`ruff check --select UP --fix`
