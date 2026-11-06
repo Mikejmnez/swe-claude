@@ -16,7 +16,7 @@ Handle a task: $ARGUMENTS
    a task entry:**
    - Title (short)
    - Category: Dependency Update / Code Cleanup / Test Coverage / Build & Tooling /
-     Documentation / Other — ask, don't guess
+     Documentation / Analysis / Other — ask, don't guess
    - **In scope:** exactly what's included, specific enough that "does this file
      count" has an obvious answer
    - **Out of scope:** what looks related but isn't included this time
@@ -37,7 +37,12 @@ Handle a task: $ARGUMENTS
    highest existing number, increment) and append a new section following the
    existing format, `Status: Open`.
 
-5. **Draft the plan** using the shape in `ai-plans/_template-task.md`: scope (in/out),
+5. **Draft the plan.** For an **Analysis** task, use the shape in
+   `ai-plans/_template-analysis.md` — question, data and versions, method (flagging
+   choices that should become ADRs), every output that reaches the manuscript and
+   what produces it, and the re-run command — and write it to
+   `ai-plans/analysis-<slug>-plan.md`. For every other category, use the shape in
+   `ai-plans/_template-task.md`: scope (in/out),
    approach, and — for anything mechanical — how completeness gets checked (a
    `grep` count before and after, an enumerated list checked off) rather than "done
    when it looks done." Write it to `ai-plans/task-<slug>-plan.md`. Confirm before

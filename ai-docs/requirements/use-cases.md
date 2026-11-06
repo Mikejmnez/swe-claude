@@ -37,5 +37,34 @@ invalidated
 
 ---
 
+## UC-ANALYSIS-EXAMPLE — Compare satellite SST products against in-situ matchups
+
+*(delete this section once you've seen the shape — a research-flavoured example of the
+same template)*
+
+**Actor(s):** Ocean scientist evaluating which SST product to use in a study
+
+**Trigger:** Scientist needs an error estimate for each product over their region and
+period
+
+**Preconditions:** Matchup files for the period exist; product versions are recorded
+
+**Main flow:**
+1. Scientist selects region, period and products
+2. System computes per-product bias and standard deviation against the matchups
+3. System produces the comparison figure and a table of the statistics
+4. Scientist cites the figure and numbers in the manuscript
+
+**Alternate / exception flows:**
+- Too few matchups in a cell → that cell is masked and the count is reported, not
+  interpolated
+- Product version differs from the recorded one → run stops and reports the mismatch
+
+**Postconditions:** Figure and numbers regenerate identically from a clean checkout
+
+**Related requirements:** FR-EXAMPLE, NFR-EXAMPLE (add real IDs once they exist)
+
+---
+
 <!-- Copy the template above for each new use case. Sequential UC-### heading,
      same subsection order, so /trace can parse it. -->

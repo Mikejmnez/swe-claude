@@ -40,6 +40,7 @@ ai-plans/
   _template-plan.md                          # shape every generated feature plan follows
   _template-bugfix.md                        # shape every generated bugfix plan follows
   _template-task.md                          # shape every generated task plan follows
+  _template-analysis.md                      # shape for Analysis tasks (data → figures/numbers)
 .claude/
   commands/
     init-planning.md      # /init-planning   — first-time interview & doc seeding
@@ -50,6 +51,9 @@ ai-plans/
     plan-task.md             # /plan-task       — log a maintenance/engineering task, draft a plan
     trace.md                # /trace           — find every reference to an ID
     audit-plan.md           # /audit-plan      — check a plan's citations, report only
+  rules/
+    notebooks.md           # loads for *.ipynb — pair with .py, no outputs, run top to bottom
+    latex.md               # loads for *.tex/*.bib — generated numbers, figure sources, build
   agents/
     requirements-reviewer.md  # subagent that reviews docs for vague/untestable language
   settings.json            # example permission scaffold — verify against current docs
@@ -93,8 +97,9 @@ every new project.
 `.claude/` into a repo you already have (if it already has a `CLAUDE.md` or
 `.claude/settings.json`, merge rather than overwrite). Nothing in the core template
 assumes a particular language or stack — the `.claude/` folder and `ai-docs/` folder are
-additive. The language-specific snippet (currently `python-conventions.md`) is optional:
-paste it into the Conventions section of `CLAUDE.md`. Run `/init-planning`
+additive. The conventions snippets (currently `python-conventions.md`,
+`jupyter-conventions.md` and `latex-conventions.md`) are optional: paste the ones a
+project uses into the Conventions section of `CLAUDE.md`. Run `/init-planning`
 afterward to seed the requirement docs from the existing codebase and an interview,
 rather than starting from blank tables.
 
