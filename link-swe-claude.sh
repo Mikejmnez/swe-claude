@@ -1,24 +1,34 @@
 #!/usr/bin/env bash
-# link-swe-claude.sh - symlink swe-claude's Claude scaffolding into another project.
+# link-swe-claude.sh - install swe-claude's Claude scaffolding into another project.
 #
 # Usage: link-swe-claude.sh [-n] [-c FILE] TARGET_DIR
 #   -n        dry run: report what would happen, change nothing
-#   -c FILE   link this directory's FILE (default CLAUDE.md) as TARGET_DIR/CLAUDE.md,
+#   -c FILE   import this directory's FILE (default CLAUDE.md) into TARGET_DIR/CLAUDE.md,
 #             e.g. -c CLAUDE-myproject.md
 #
-# Links .claude, ai-docs, ai-plans and CLAUDE.md from this directory into TARGET_DIR:
-#   ai-docs, ai-plans  if TARGET_DIR already has one that isn't ours, report it and
-#                      leave it alone
+# Links .claude from this directory into TARGET_DIR, imports this directory's CLAUDE
+# file into the project's own CLAUDE.md, and COPIES ai-docs and ai-plans (each project keeps its own requirements, ADRs, bugs, tasks
+# and plans, with its own ID sequences, committed in that project):
+#   ai-docs, ai-plans  copied from this directory when TARGET_DIR has none; a project
+#                      that already has its own is left alone; a link to this
+#                      directory (made by an older version) is replaced by a copy
 #   .claude            if TARGET_DIR already has one, report it and leave it alone
-#   CLAUDE.md          an existing CLAUDE.md is moved to CLAUDE.md.orig first; one that
-#                      already links to a different CLAUDE file here is re-pointed
+#   CLAUDE.md          the project keeps its own; an '@~/.../CLAUDE.md' import line
+#                      is appended to it (or it is created holding just that line).
+#                      A CLAUDE.md that is a link here (made by an older version) is
+#                      removed and CLAUDE.md.orig, if any, is moved back first
+# The copies come from this directory's working tree: copy from a checkout of main,
+# whose ai-docs holds only the _EXAMPLE_ entries.
 # Links made by older versions of this script (docs or ai-docs -> $SRC/docs, and
-# the same for plans) are removed and replaced by the ai-docs / ai-plans links.
-# If TARGET_DIR is in a git work tree, the new names are added to that repo's
-# .git/info/exclude so they never show up in 'git status', and the entries for
-# removed docs / plans links are taken out.
+# the same for plans) are removed.
+# If TARGET_DIR is in a git work tree, the .claude link is added to that repo's
+# .git/info/exclude so they never show up in 'git status'; ai-docs and ai-plans are
+# NOT excluded (commit them, with CLAUDE.md), and exclude entries left by older
+# versions for docs, plans, ai-docs, ai-plans, CLAUDE.md or CLAUDE.md.orig are
+# taken out.
 # Safe to re-run: links that already point here are left as they are.
-# Exit status is 1 if anything could not be linked (e.g. the project has its own .claude).
+# Exit status is 1 if anything could not be linked or copied (e.g. the project has
+# its own .claude).
 #
 # Written for bash 3.2 (macOS) and later.
 
@@ -61,7 +71,7 @@ esac
 TARGET=$(cd "$1" 2>/dev/null && pwd -P) || { warn "not a directory: $1"; exit 1; }
 [ "$TARGET" != "$SRC" ] || { warn "target is swe-claude itself"; exit 1; }
 
-say "Linking $SRC into $TARGET"
+say "Installing $SRC into $TARGET"
 
 excludes=""        # space-separated names to add to .git/info/exclude
 stale_excludes=""  # names of removed old links to take out of .git/info/exclude
@@ -114,55 +124,58 @@ for old in docs plans; do
     done
 done
 
+# ai-docs, ai-plans: each project gets its own copy, never a shared link.
 for name in ai-docs ai-plans; do
+    path="$TARGET/$name"
+    stale_excludes="$stale_excludes $name"      # older versions excluded the link
     case " $removed " in *" $name "*) was_removed=1 ;; *) was_removed=0 ;; esac
-    if [ "$dry_run" -eq 1 ] && [ "$was_removed" -eq 1 ]; then   # nothing really removed, so don't re-check
-        say "link: $name -> $SRC/$name"
-        excludes="$excludes $name"
-    else
-        make_link "$name" "$name"
+    if is_our_link "$path" "$name"; then
+        say "remove: $name (link to $SRC/$name; replacing it with a copy)"
+        run rm "$path" || { status=1; continue; }
+        was_removed=1
     fi
+    if [ "$was_removed" -eq 0 ] && exists "$path"; then
+        say "ok:   $name already exists in $TARGET; keeping the project's own copy"
+        continue
+    fi
+    say "copy: $SRC/$name -> $name"
+    run cp -R "$SRC/$name" "$path" || status=1
 done
 
-# CLAUDE.md: re-point a link to another of our CLAUDE files, or move an
-# existing file aside, then link.
+# CLAUDE.md: the project keeps its own; swe-claude's rules come in through an
+# @-import line appended to it. A link made by an older version is undone first.
+case $SRC in
+    "$HOME"/*) imp_path="~${SRC#"$HOME"}/$claude_md" ;;
+    *)         imp_path="$SRC/$claude_md" ;;
+esac
+import_line="@$imp_path"
 c="$TARGET/CLAUDE.md"
-if is_swe_link "$c" && ! is_our_link "$c" "$claude_md"; then
-    say "relink: CLAUDE.md was -> $(readlink "$c")"
-    if run rm "$c"; then
-        if [ "$dry_run" -eq 1 ]; then          # nothing really removed, so don't re-check
-            say "link: CLAUDE.md -> $SRC/$claude_md"
-            excludes="$excludes CLAUDE.md"
-        else
-            make_link "$claude_md" CLAUDE.md
-        fi
-    else
-        status=1
-    fi
-elif exists "$c" && ! is_our_link "$c" "$claude_md"; then
+stale_excludes="$stale_excludes CLAUDE.md CLAUDE.md.orig"
+check="$c"                                    # the file that will end up as CLAUDE.md
+if is_swe_link "$c"; then
+    say "remove: CLAUDE.md (link to $(readlink "$c"))"
+    run rm "$c" || status=1
     if exists "$c.orig"; then
-        warn "CLAUDE.md and CLAUDE.md.orig both exist in $TARGET; leaving both alone (CLAUDE.md NOT linked)"
-        status=1
+        say "restore: CLAUDE.md.orig -> CLAUDE.md"
+        run mv "$c.orig" "$c" || status=1
+        [ "$dry_run" -eq 1 ] && check="$c.orig"   # nothing really moved
     else
-        if is_tracked CLAUDE.md; then
-            warn "CLAUDE.md is tracked by git in $TARGET; git will now report it as changed"
-            warn "  to hide that locally: git -C '$TARGET' update-index --skip-worktree CLAUDE.md"
-        fi
-        say "move: CLAUDE.md -> CLAUDE.md.orig"
-        if run mv "$c" "$c.orig"; then
-            excludes="$excludes CLAUDE.md.orig"
-            if [ "$dry_run" -eq 1 ]; then      # nothing really moved, so don't re-check
-                say "link: CLAUDE.md -> $SRC/$claude_md"
-                excludes="$excludes CLAUDE.md"
-            else
-                make_link "$claude_md" CLAUDE.md
-            fi
-        else
-            status=1
-        fi
+        check=""
     fi
+fi
+if [ -L "$c" ] && ! is_swe_link "$c"; then
+    warn "CLAUDE.md in $TARGET is a link to $(readlink "$c"); not appending to it (swe-claude's rules NOT imported)"
+    status=1
+elif [ -n "$check" ] && [ -f "$check" ] && grep -qxF "$import_line" "$check"; then
+    say "ok:   CLAUDE.md already imports $imp_path"
 else
-    make_link "$claude_md" CLAUDE.md
+    say "import: append $import_line to CLAUDE.md"
+    if [ "$dry_run" -eq 0 ]; then
+        {
+            [ -s "$c" ] && printf '\n'
+            printf '%s\n%s\n' "<!-- swe-claude planning rules, added by link-swe-claude.sh -->" "$import_line"
+        } >> "$c" || status=1
+    fi
 fi
 
 # Keep the links out of the project's git status.

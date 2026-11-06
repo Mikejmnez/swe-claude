@@ -33,7 +33,7 @@ ai-docs/
   bugs/
     BUG-LOG.md                               # BUG-001, ... — report → root cause → fix
   tasks/
-    TASK-LOG.md                              # TASK-001, ... — scoped maintenance/engineering work
+    TASK-LOG.md                              # TASK-001, ... — other tracked work (not a feature or bug)
   deep-dives/
     README.md                                # convention note; one file per investigation
 ai-plans/
@@ -47,7 +47,7 @@ ai-plans/
     fix-bug.md              # /fix-bug         — log a bug, find root cause, plan the fix
     deep-dive.md             # /deep-dive       — read-only code investigation, saved findings
     new-requirement.md     # /new-requirement — add an FR/NFR/UC/IC by interview
-    plan-task.md             # /plan-task       — log a maintenance/engineering task, draft a plan
+    plan-task.md             # /plan-task       — log a task, draft a plan
     trace.md                # /trace           — find every reference to an ID
     audit-plan.md           # /audit-plan      — check a plan's citations, report only
   agents/

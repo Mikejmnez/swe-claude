@@ -1,9 +1,11 @@
-<!-- CONTRACT: scoped engineering/maintenance work that isn't new capability (FR/NFR/
-     UC) and isn't corrective (BUG) — dependency bumps, removing dead code or stale
-     compile-time directives, retrofitting tests onto code that predates them,
-     build/tooling changes. The common thread: the "right" outcome is usually
-     mechanical and completeness matters (did every instance get handled?), not
-     open-ended design. Delete the TASK-EXAMPLE section once you've seen the shape. -->
+<!-- CONTRACT: any tracked work that isn't new capability (FR/NFR/UC) and isn't
+     corrective (BUG) — dependency bumps, removing dead code or stale compile-time
+     directives, retrofitting tests onto code that predates them, build/tooling
+     changes, an analysis or figure, a documentation pass. The test for logging one
+     at all: does it need a status line — can it meaningfully be in progress or
+     blocked? A question, a lookup or a one-line fix is not a task. Whatever the kind,
+     pin the scope down: completeness (did every instance get handled?) is where tasks
+     fail quietly. Delete the TASK-EXAMPLE section once you've seen the shape. -->
 
 # Task Log
 

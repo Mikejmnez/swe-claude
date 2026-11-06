@@ -1,5 +1,5 @@
 ---
-description: Log a maintenance/engineering task (or resume an existing one) and draft a plan for it — for scoped mechanical work that isn't new capability or a bug fix
+description: Log a task (or resume an existing one) and draft a plan for it — for any tracked work that isn't new capability or a bug fix
 argument-hint: <description of the task, or an existing TASK-### ID>
 ---
 
