@@ -13,8 +13,8 @@ Convention: `TASK-###`, sequential, never renumbered. Status: `Open` → `Plan R
 `In Progress` → `Done` (or `Won't Do` / `Superseded by TASK-0XX`). **Only the user sets
 `Done`** — it's a claim about verified work, not something to self-report from having
 written a plan. Category is one of: Dependency
-Update, Code Cleanup, Test Coverage, Build/Tooling, Documentation (add categories as
-needed).
+Update, Code Cleanup, Test Coverage, Build/Tooling, Documentation, Analysis (add
+categories as needed). An Analysis task is planned with `ai-plans/_template-analysis.md`.
 
 ---
 
