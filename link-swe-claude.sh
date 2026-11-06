@@ -4,7 +4,7 @@
 # Usage: link-swe-claude.sh [-n] [-c FILE] TARGET_DIR
 #   -n        dry run: report what would happen, change nothing
 #   -c FILE   link this directory's FILE (default CLAUDE.md) as TARGET_DIR/CLAUDE.md,
-#             e.g. -c CLAUDE-bes.md
+#             e.g. -c CLAUDE-myproject.md
 #
 # Links .claude, ai-docs, ai-plans and CLAUDE.md from this directory into TARGET_DIR:
 #   ai-docs, ai-plans  if TARGET_DIR already has one that isn't ours, report it and
