@@ -17,7 +17,7 @@
 | `template/ai-docs/`, `template/ai-plans/` | blank logs with `_EXAMPLE_` entries, plan templates | copied once; the project's copy is its own |
 | `template/CLAUDE.md` | skeleton project `CLAUDE.md` with `{{…}}` fields | copied only when the project has no `CLAUDE.md` |
 | `*-conventions.md` | Conventions snippets (Python, Jupyter, LaTeX) | pasted by hand into the project's `CLAUDE.md` |
-| `link-swe-claude.sh` | the installer | run by hand, on a new or existing repo |
+| `link-swe-claude.sh` | the installer; `-r DIR` keeps a project's records in `DIR` and links them in | run by hand, on a new or existing repo |
 | `ai-docs/`, `ai-plans/` | **swe-claude's own** records and plans | never — they are not the template |
 
 `ai-plans/_template-*.md` here are links to `template/ai-plans/`, so this repo's own

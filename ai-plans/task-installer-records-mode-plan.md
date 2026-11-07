@@ -1,9 +1,10 @@
 # Task Plan: Installer option to keep a project's records in a separate repo
 
 **Task:** TASK-001
-**Status:** Draft
+**Status:** In Progress
 **Created:** 2026-11-06
-**Paused:** 2026-11-06 — not yet approved; see TASK-001 in `ai-docs/tasks/TASK-LOG.md`
+**Resumed:** 2026-11-06 — project clean-up reported done; see *Current state of the
+four projects*. Approved 2026-11-06.
 
 ## Summary
 
@@ -20,8 +21,25 @@ user wants the same for StirMix.jl and HillFunctions.jl, with all four syncing
 between two machines through one private records repo. Today's installer cannot do
 this: it copies `ai-docs/` and `ai-plans/` into the project (so they are either
 committed or unsynced), and it refuses to link `.claude/` into a project that has its
-own — which all four do. The by-hand alternative is six links plus exclude lines per
-project per machine.
+own — which HillFunctions.jl and StirMix.jl do, holding `plans/` and `skills/` the
+user wants kept. The by-hand alternative is six links plus exclude lines per project
+per machine.
+
+## Current state of the four projects
+
+Checked on 2026-11-06 with `ls`, `git ls-files` and `git check-ignore` in each repo:
+
+| Project | Path | `.claude/` | `CLAUDE.md`, `ai-docs/`, `ai-plans/` |
+|---|---|---|---|
+| oceanspy | `~/oceanspy` | none | none |
+| pydap | `~/pydap` | none | none |
+| HillFunctions.jl | `~/HillFunctions.jl` | `plans/` (2 files), `skills/` (1 file); untracked, ignored by the tracked `.gitignore` line `.claude/*` | none |
+| StirMix.jl | `~/StirMix.jl` | `plans/` (7 files), `skills/` (1 file); untracked, ignored by the tracked `.gitignore` line `.claude/*` | none |
+
+So oceanspy and pydap take the "no `.claude/`" branch of scope item 3, and the two
+Julia projects take the "own `.claude/`" branch, with no name clash: neither has
+`commands/`, `agents/` or `rules/`. None of the four has an `.git/info/exclude`
+entry today.
 
 ## Related requirements / constraints
 
@@ -45,8 +63,8 @@ nothing else:
 3. **`.claude/` under `-r`.** If the target has no `.claude/`, create a real
    directory. Inside it, link `commands`, `agents` and `rules` to swe-claude's; any of
    those three that already exists and is not our link is reported and left alone,
-   status 1. Everything else in the project's `.claude/` (e.g. `plans/`, `skills/`) is
-   untouched. `settings.json` is not linked (see Open questions).
+   status 1. Everything else in the project's `.claude/` (e.g. the Julia projects'
+   `plans/` and `skills/`) is untouched: not moved, not linked, not excluded. `settings.json` is not linked (see Open questions).
 4. **Excludes.** Under `-r`, add `/ai-docs`, `/ai-plans`, `/CLAUDE.md`,
    `/.claude/commands`, `/.claude/agents`, `/.claude/rules` (skipping tracked paths,
    as now). Not the whole `/.claude`: that would also hide new files the project may
@@ -72,6 +90,8 @@ nothing else:
 - Projects that track their own `CLAUDE.md`: under `-r` they hit case (2) and get a
   warning. No `CLAUDE.local.md` route this time.
 - Moving existing real `ai-docs/` / `ai-plans/` into `DIR` (migration).
+- Moving or syncing a project's own `.claude/plans/` or `.claude/skills/` through
+  `DIR`. They stay in the project, on one machine (see Open questions).
 - Adding `@AGENTS.md` for pydap — a hand edit to `swe-records/pydap/CLAUDE.md`.
 - A Julia conventions snippet.
 - The branch-discipline wording in `planning-rules.md` (see Open questions).
@@ -102,7 +122,7 @@ duplicate exclude lines), and check `git status --short` shows none of the six.
 | Case | Setup | Expect |
 |---|---|---|
 | Fresh | empty git repo, `DIR` absent | `DIR` seeded; six links; six excludes |
-| Own `.claude/` | repo with `.claude/plans/x.md` | `plans/x.md` untouched; three links inside |
+| Own `.claude/` | repo with `.claude/plans/x.md`, `.claude/skills/y.md`, and a committed `.gitignore` holding `.claude/*` (the Julia layout) | both files untouched; three links inside; `git status` clean |
 | Second machine | `DIR` already seeded; fresh repo | nothing copied into `DIR`; six links |
 | Conflict | repo with real `ai-docs/` | warned, left alone, exit 1; others still linked |
 | Re-run without `-r` | after Fresh | exclude lines still present |
@@ -122,11 +142,17 @@ check that Claude Code follows symlinked command folders and edits through linke
   `Edit(./**)`. The manual check above catches it.
 - **Records go uncommitted.** Changes in `DIR` do not show in the project's
   `git status`; nothing in this task prompts to commit them.
-- **Paths per machine.** Links are absolute; both machines need the records repo and
+- **Paths per machine.** The four projects are at `~/<name>`, not under
+  `~/Git_Repos`; links are absolute; both machines need the records repo and
   swe-claude at the same `~`-relative paths. The script cannot enforce this.
 - **Regression in the default mode** — covered by the "Old mode" case.
 
 ## Open questions
+
+- **The Julia projects' `.claude/plans/` and `.claude/skills/`:** they are not in any
+  repo today (ignored by `.claude/*`), so they exist on one machine only. This plan
+  leaves them there. Moving them into `DIR` would sync them, but is a migration and is
+  out of scope.
 
 - **`settings.json`:** swe-claude's only allows `Read(./**)` and `Edit(./**)`. Under
   `-r`, link it when the project has none, or never? Does not block: proposed default

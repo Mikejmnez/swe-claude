@@ -92,18 +92,125 @@ quick read-only look.
 
 ## Installing into a project
 
-Run the link script on a new (after `git init`) or existing repo:
+There are two ways to install, and they differ only in where the project's records
+(`ai-docs/`, `ai-plans/`, `CLAUDE.md`) live:
 
-    ~/Git_Repos/swe-claude/link-swe-claude.sh <project-dir>     # -n for a dry run
+| Option | Records live | Use it when |
+|---|---|---|
+| A. Records in the project | in the project, committed with its code | the project is yours and its records may be public with it |
+| B. Records kept private (`-r`) | in a separate private records repo, linked into the project | the project is a public upstream repo, or the records should not travel with the code |
 
-A project with no `CLAUDE.md` gets `template/CLAUDE.md`, whose `{{…}}` fields need
-filling in. It copies `template/ai-docs` and `template/ai-plans` into the project (its own copy,
-committed there, with its own ID sequences), links `.claude/` (kept out of git), and
-appends an `@~/Git_Repos/swe-claude/planning-rules.md` line to the project's own
-`CLAUDE.md`. It is safe to re-run. The conventions snippets are optional: paste the
-ones a project uses into the Conventions section of its `CLAUDE.md`. Run
-`/init-planning` afterward to seed the requirement docs from the existing codebase
-and an interview, rather than starting from blank tables.
+Either way, swe-claude's commands, agent and rules come in through links, and are
+kept out of the project's `git status`. In the commands below, replace `<project>`
+with the project's directory name and `<project-dir>` with its path, e.g.
+`myproject` and `~/myproject`. The script is safe to re-run; always try `-n` (dry
+run, changes nothing) first.
+
+### Option A — records in the project
+
+**Install.**
+
+    ~/Git_Repos/swe-claude/link-swe-claude.sh -n <project-dir>    # dry run
+    ~/Git_Repos/swe-claude/link-swe-claude.sh <project-dir>
+
+What it does:
+
+- links `<project-dir>/.claude` to swe-claude's `.claude/`, and adds `/.claude` to
+  the project's `.git/info/exclude`. **If the project already has its own `.claude/`,
+  this step is refused** (reported, exit status 1) — use option B, which links into
+  an existing `.claude/` instead.
+- copies `template/ai-docs` and `template/ai-plans` into the project, unless it
+  already has them. They are the project's own copy, with its own ID sequences, and
+  are meant to be committed.
+- appends an `@~/Git_Repos/swe-claude/planning-rules.md` line (under a
+  `<!-- swe-claude planning rules … -->` comment) to the project's `CLAUDE.md`; a
+  project with none first gets `template/CLAUDE.md`, whose `{{…}}` fields need
+  filling in.
+
+Then commit `ai-docs/`, `ai-plans/` and `CLAUDE.md` in the project.
+
+**Remove.** From the project's top directory:
+
+    rm .claude                                         # the link only
+    grep -vxF '/.claude' .git/info/exclude > .git/info/exclude.new && mv .git/info/exclude.new .git/info/exclude
+    grep -vxF -e '@~/Git_Repos/swe-claude/planning-rules.md' \
+        -e '<!-- swe-claude planning rules, added by link-swe-claude.sh -->' CLAUDE.md > CLAUDE.md.new && mv CLAUDE.md.new CLAUDE.md
+
+`ai-docs/`, `ai-plans/` and `CLAUDE.md` are the project's own files: delete them
+(`git rm -r`) only if you no longer want the records.
+
+### Option B — records kept private (`-r`)
+
+**Install.** One folder per project inside a private records repo, here
+`~/Git_Repos/swe-records`:
+
+    ~/Git_Repos/swe-claude/link-swe-claude.sh -n -r ~/Git_Repos/swe-records/<project> <project-dir>    # dry run
+    ~/Git_Repos/swe-claude/link-swe-claude.sh -r ~/Git_Repos/swe-records/<project> <project-dir>
+
+What it does:
+
+- creates `~/Git_Repos/swe-records/<project>/` if missing, and seeds it from
+  `template/` with `ai-docs/`, `ai-plans/` and `CLAUDE.md` (plus the import line).
+  Anything already there is never overwritten.
+- links `<project-dir>/ai-docs`, `ai-plans` and `CLAUDE.md` to that folder, so every
+  edit made in the project lands in the records repo.
+- keeps the project's `.claude/` a real directory (creating it if missing) and links
+  swe-claude's `commands/`, `agents/` and `rules/` into it. Anything else in it —
+  `plans/`, `skills/`, `settings.json` — is left alone; `settings.json` is never
+  linked.
+- adds all six links to the project's `.git/info/exclude`, so nothing shows in its
+  `git status` or reaches its remote.
+
+Anything already in the project under one of those six names, and not the expected
+link, is reported and left alone (exit status 1); move it out of the way and re-run.
+
+The script never runs git in the records folder. The first time, make it a repo and
+keep it private:
+
+    cd ~/Git_Repos/swe-records && git init     # once; then add a private remote
+
+After working in a project, commit and push the records there, not in the project:
+
+    cd ~/Git_Repos/swe-records && git add -A && git commit -m "<project>: …" && git push
+
+**Second machine.** Clone swe-claude and swe-records to the **same paths** as on the
+first machine (the links are absolute), then run the same install command. The
+folder is already seeded, so it only makes the links and exclude lines.
+
+**Remove.** From the project's top directory:
+
+    rm ai-docs ai-plans CLAUDE.md .claude/commands .claude/agents .claude/rules    # links only
+    rmdir .claude          # fails, harmlessly, if the project has its own files in .claude/
+    grep -vxE '/(ai-docs|ai-plans|CLAUDE\.md|\.claude/(commands|agents|rules))' .git/info/exclude \
+        > .git/info/exclude.new && mv .git/info/exclude.new .git/info/exclude
+
+The records stay in `~/Git_Repos/swe-records/<project>/`; delete that folder too only
+if you no longer want them.
+
+### Checking that it works (either option)
+
+In the project's top directory:
+
+    git status --short     # nothing from swe-claude should appear
+    ls -la . .claude       # the links, and where they point
+
+Then start Claude Code there (`claude`) and check three things:
+
+1. Type `/` — `/plan-task`, `/plan-feature` and the other commands are listed. (The
+   commands come through a link.)
+2. Ask *"what planning rules apply here?"* — the answer describes the `FR`/`TASK`
+   IDs and the branch rules. (`CLAUDE.md` and its import line were read.)
+3. Ask it to append a line `test` to `ai-docs/tasks/TASK-LOG.md`, then check where the
+   line landed and remove it. With option B it must be in the records repo:
+
+       tail -1 ~/Git_Repos/swe-records/<project>/ai-docs/tasks/TASK-LOG.md
+
+### After installing
+
+The conventions snippets (`*-conventions.md`) are optional: paste the ones a project
+uses into the Conventions section of its `CLAUDE.md`. Run `/init-planning` to seed the
+requirement docs from the existing codebase and an interview, rather than starting
+from blank tables.
 
 ## First steps in a new project
 
