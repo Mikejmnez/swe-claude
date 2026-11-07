@@ -1,9 +1,7 @@
 # swe-claude
 
-NB: The branch mju/development is intended to use the tools in the repo to 
-maintain and extend it. Merge work done there to main and then _delete the 
-TASK-, BUG-, and new files in ai-pans and ai-docs_ unless they are actually
-intended for the template.
+NB: the top-level `ai-docs/` and `ai-plans/` are swe-claude's **own** records. What
+projects receive is `template/`, `planning-rules.md` and `.claude/`; see `CLAUDE.md`.
 
 A Claude Code project template for **requirements-driven planning**: write your
 functional requirements, non-functional requirements, use cases, and implementation
@@ -20,28 +18,34 @@ the system should do, and will the plan say which requirement each step satisfie
 ## What you get
 
 ```
-CLAUDE.md                                   # rules Claude reads every session
-ai-docs/
-  requirements/
-    functional-requirements.md              # FR-001, FR-002, ...
-    non-functional-requirements.md          # NFR-001, ...
-    use-cases.md                             # UC-001, ...
-  constraints/
-    implementation-constraints.md            # IC-001, ... — hard boundaries
-  decisions/
-    DECISIONS.md                             # ADR-001, ... — why, not what
-  bugs/
-    BUG-LOG.md                               # BUG-001, ... — report → root cause → fix
-  tasks/
-    TASK-LOG.md                              # TASK-001, ... — other tracked work (not a feature or bug)
-  deep-dives/
-    README.md                                # convention note; one file per investigation
-ai-plans/
-  _template-plan.md                          # shape every generated feature plan follows
-  _template-bugfix.md                        # shape every generated bugfix plan follows
-  _template-task.md                          # shape every generated task plan follows
-  _template-analysis.md                      # shape for Analysis tasks (data → figures/numbers)
-.claude/
+planning-rules.md                           # rules every project imports into its CLAUDE.md
+link-swe-claude.sh                          # installs the kit into a project
+python-conventions.md                       # Conventions snippets, pasted by hand
+jupyter-conventions.md
+latex-conventions.md
+template/                                   # copied into each project, once
+  CLAUDE.md                                 # skeleton, only if the project has none
+  ai-docs/
+    requirements/
+      functional-requirements.md            # FR-001, FR-002, ...
+      non-functional-requirements.md        # NFR-001, ...
+      use-cases.md                          # UC-001, ...
+    constraints/
+      implementation-constraints.md         # IC-001, ... — hard boundaries
+    decisions/
+      DECISIONS.md                          # ADR-001, ... — why, not what
+    bugs/
+      BUG-LOG.md                            # BUG-001, ... — report → root cause → fix
+    tasks/
+      TASK-LOG.md                           # TASK-001, ... — other tracked work (not a feature or bug)
+    deep-dives/
+      README.md                             # convention note; one file per investigation
+  ai-plans/
+    _template-plan.md                       # shape every generated feature plan follows
+    _template-bugfix.md                     # shape every generated bugfix plan follows
+    _template-task.md                       # shape every generated task plan follows
+    _template-analysis.md                   # shape for Analysis tasks (data → figures/numbers)
+.claude/                                    # linked into each project
   commands/
     init-planning.md      # /init-planning   — first-time interview & doc seeding
     plan-feature.md        # /plan-feature    — requirements → phased plan
@@ -57,6 +61,7 @@ ai-plans/
   agents/
     requirements-reviewer.md  # subagent that reviews docs for vague/untestable language
   settings.json            # example permission scaffold — verify against current docs
+ai-docs/, ai-plans/                         # swe-claude's own records — not the template
 ```
 
 Every requirement, use case, and constraint gets a stable ID (`FR-001`, `NFR-014`,
@@ -85,28 +90,25 @@ get saved to `ai-docs/deep-dives/` so the same investigation doesn't happen twic
 `/plan-feature` and `/fix-bug` both hand off to it when what they need is more than a
 quick read-only look.
 
-## Using this as a template
+## Installing into a project
 
-**Option A — GitHub template repository.** Push this to GitHub, then in
-**Settings → General**, check **"Template repository."** After that, **Use this
-template** on the repo page (or `gh repo create my-project --template
-<you>/claude-swe-planning-template`) gives you a fresh copy with its own history for
-every new project.
+Run the link script on a new (after `git init`) or existing repo:
 
-**Option B — copy into an existing repo.** Copy `CLAUDE.md`, `ai-docs/`, `ai-plans/`, and
-`.claude/` into a repo you already have (if it already has a `CLAUDE.md` or
-`.claude/settings.json`, merge rather than overwrite). Nothing in the core template
-assumes a particular language or stack — the `.claude/` folder and `ai-docs/` folder are
-additive. The conventions snippets (currently `python-conventions.md`,
-`jupyter-conventions.md` and `latex-conventions.md`) are optional: paste the ones a
-project uses into the Conventions section of `CLAUDE.md`. Run `/init-planning`
-afterward to seed the requirement docs from the existing codebase and an interview,
-rather than starting from blank tables.
+    ~/Git_Repos/swe-claude/link-swe-claude.sh <project-dir>     # -n for a dry run
+
+A project with no `CLAUDE.md` gets `template/CLAUDE.md`, whose `{{…}}` fields need
+filling in. It copies `template/ai-docs` and `template/ai-plans` into the project (its own copy,
+committed there, with its own ID sequences), links `.claude/` (kept out of git), and
+appends an `@~/Git_Repos/swe-claude/planning-rules.md` line to the project's own
+`CLAUDE.md`. It is safe to re-run. The conventions snippets are optional: paste the
+ones a project uses into the Conventions section of its `CLAUDE.md`. Run
+`/init-planning` afterward to seed the requirement docs from the existing codebase
+and an interview, rather than starting from blank tables.
 
 ## First steps in a new project
 
-1. Fill in `{{PROJECT_NAME}}`, `{{ONE_LINE_DESCRIPTION}}`, and `{{CONVENTIONS}}` in
-   `CLAUDE.md` — or run `/init-planning` and let the interview do it.
+1. Fill in the project's own `CLAUDE.md` (description and Conventions) — or run
+   `/init-planning` and let the interview do it.
 2. Delete the `_EXAMPLE_` rows in each `ai-docs/requirements/*.md` and
    `ai-docs/constraints/*.md` file once you've seen the format — they're there to show
    the table shape, not to be real requirements.

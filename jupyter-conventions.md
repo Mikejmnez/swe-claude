@@ -1,5 +1,5 @@
-<!-- Paste the body below into CLAUDE.md in place of the {{CONVENTIONS}} placeholder
-     (alongside python-conventions.md, which governs the package code notebooks
+<!-- Paste the body below into the project's own CLAUDE.md, in its Conventions
+     section (alongside python-conventions.md, which governs the package code notebooks
      import), and drop or demote this H2 so CLAUDE.md keeps a single
      `## Conventions` heading. The per-file rules live in .claude/rules/notebooks.md. -->
 
