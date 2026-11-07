@@ -58,12 +58,12 @@ and usage text, `README.md` and the `CLAUDE.md` layout table. Does not include
 creating the records repo, setting up any real project, or changing how the script
 behaves without `-r` beyond protecting exclude entries for symlinks.
 
-**Motivation:** pydap and oceanspy are public upstream repos, and the records of all
-four current projects (oceanspy, StirMix.jl, HillFunctions.jl, pydap) are to stay off
-GitHub while syncing between two machines. HillFunctions.jl and StirMix.jl have their own `.claude/` (holding `plans/` and
-`skills/` to keep), which the current installer refuses to touch, so neither would get
-the commands — oceanspy and pydap have none; and doing the layout by hand is six links plus their exclude lines,
-per project, per machine — eight times over for four projects on two machines.
+**Motivation:** two of the four current projects are public upstream repos, and the
+records of all four are to stay off GitHub while syncing between two machines. Two of
+them have their own `.claude/` (holding `plans/` and `skills/` to keep), which the
+current installer refuses to touch, so neither would get the commands — the other two
+have none; and doing the layout by hand is six links plus their exclude lines, per
+project, per machine — eight times over for four projects on two machines.
 
 ---
 

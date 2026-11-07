@@ -16,12 +16,12 @@ all of it stays out of the project's git, durably.
 
 ## Motivation
 
-The records of pydap and oceanspy must not reach their public upstream repos, and the
-user wants the same for StirMix.jl and HillFunctions.jl, with all four syncing
+The records of two of the four projects (P1, P2) must not reach their public upstream
+repos, and the user wants the same for the other two (P3, P4), with all four syncing
 between two machines through one private records repo. Today's installer cannot do
 this: it copies `ai-docs/` and `ai-plans/` into the project (so they are either
 committed or unsynced), and it refuses to link `.claude/` into a project that has its
-own — which HillFunctions.jl and StirMix.jl do, holding `plans/` and `skills/` the
+own — which P3 and P4 do, holding `plans/` and `skills/` the
 user wants kept. The by-hand alternative is six links plus exclude lines per project
 per machine.
 
@@ -31,13 +31,12 @@ Checked on 2026-11-06 with `ls`, `git ls-files` and `git check-ignore` in each r
 
 | Project | Path | `.claude/` | `CLAUDE.md`, `ai-docs/`, `ai-plans/` |
 |---|---|---|---|
-| oceanspy | `~/oceanspy` | none | none |
-| pydap | `~/pydap` | none | none |
-| HillFunctions.jl | `~/HillFunctions.jl` | `plans/` (2 files), `skills/` (1 file); untracked, ignored by the tracked `.gitignore` line `.claude/*` | none |
-| StirMix.jl | `~/StirMix.jl` | `plans/` (7 files), `skills/` (1 file); untracked, ignored by the tracked `.gitignore` line `.claude/*` | none |
+| P1 (public upstream) | `~/<P1>` | none | none |
+| P2 (public upstream) | `~/<P2>` | none | none |
+| P3 | `~/<P3>` | `plans/` (2 files), `skills/` (1 file); untracked, ignored by the tracked `.gitignore` line `.claude/*` | none |
+| P4 | `~/<P4>` | `plans/` (7 files), `skills/` (1 file); untracked, ignored by the tracked `.gitignore` line `.claude/*` | none |
 
-So oceanspy and pydap take the "no `.claude/`" branch of scope item 3, and the two
-Julia projects take the "own `.claude/`" branch, with no name clash: neither has
+So P1 and P2 take the "no `.claude/`" branch of scope item 3, and P3 and P4 take the "own `.claude/`" branch, with no name clash: neither has
 `commands/`, `agents/` or `rules/`. None of the four has an `.git/info/exclude`
 entry today.
 
@@ -63,7 +62,7 @@ nothing else:
 3. **`.claude/` under `-r`.** If the target has no `.claude/`, create a real
    directory. Inside it, link `commands`, `agents` and `rules` to swe-claude's; any of
    those three that already exists and is not our link is reported and left alone,
-   status 1. Everything else in the project's `.claude/` (e.g. the Julia projects'
+   status 1. Everything else in the project's `.claude/` (e.g. P3's and P4's
    `plans/` and `skills/`) is untouched: not moved, not linked, not excluded. `settings.json` is not linked (see Open questions).
 4. **Excludes.** Under `-r`, add `/ai-docs`, `/ai-plans`, `/CLAUDE.md`,
    `/.claude/commands`, `/.claude/agents`, `/.claude/rules` (skipping tracked paths,
@@ -83,17 +82,17 @@ nothing else:
 
 - Creating `swe-records`, `git init`, GitHub, or any commit or push in `DIR`. The
   script never runs git in `DIR`.
-- Setting up oceanspy, StirMix.jl, HillFunctions.jl or pydap — a follow-on, after
+- Setting up any of the four projects — a follow-on, after
   this lands.
-- Per-subfolder `.claude/` linking **without** `-r` (would fix pydap-style conflicts
+- Per-subfolder `.claude/` linking **without** `-r` (would fix P2-style conflicts
   for projects that do commit their records). Possible later task.
 - Projects that track their own `CLAUDE.md`: under `-r` they hit case (2) and get a
   warning. No `CLAUDE.local.md` route this time.
 - Moving existing real `ai-docs/` / `ai-plans/` into `DIR` (migration).
 - Moving or syncing a project's own `.claude/plans/` or `.claude/skills/` through
   `DIR`. They stay in the project, on one machine (see Open questions).
-- Adding `@AGENTS.md` for pydap — a hand edit to `swe-records/pydap/CLAUDE.md`.
-- A Julia conventions snippet.
+- Adding `@AGENTS.md` for P2 — a hand edit to `swe-records/<P2>/CLAUDE.md`.
+- A conventions snippet for P3's and P4's language.
 - The branch-discipline wording in `planning-rules.md` (see Open questions).
 
 ## Approach
@@ -122,7 +121,7 @@ duplicate exclude lines), and check `git status --short` shows none of the six.
 | Case | Setup | Expect |
 |---|---|---|
 | Fresh | empty git repo, `DIR` absent | `DIR` seeded; six links; six excludes |
-| Own `.claude/` | repo with `.claude/plans/x.md`, `.claude/skills/y.md`, and a committed `.gitignore` holding `.claude/*` (the Julia layout) | both files untouched; three links inside; `git status` clean |
+| Own `.claude/` | repo with `.claude/plans/x.md`, `.claude/skills/y.md`, and a committed `.gitignore` holding `.claude/*` (the P3/P4 layout) | both files untouched; three links inside; `git status` clean |
 | Second machine | `DIR` already seeded; fresh repo | nothing copied into `DIR`; six links |
 | Conflict | repo with real `ai-docs/` | warned, left alone, exit 1; others still linked |
 | Re-run without `-r` | after Fresh | exclude lines still present |
@@ -152,7 +151,7 @@ listed and linked `ai-docs/` readable through the link.
 
 ## Open questions
 
-- **The Julia projects' `.claude/plans/` and `.claude/skills/`:** they are not in any
+- **P3's and P4's `.claude/plans/` and `.claude/skills/`:** they are not in any
   repo today (ignored by `.claude/*`), so they exist on one machine only. This plan
   leaves them there. Moving them into `DIR` would sync them, but is a migration and is
   out of scope.
