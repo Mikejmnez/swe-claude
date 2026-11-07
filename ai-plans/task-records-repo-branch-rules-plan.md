@@ -1,7 +1,7 @@
 # Task Plan: Branch rules when a project's records live in a separate repo
 
 **Task:** TASK-002
-**Status:** In Progress
+**Status:** Done
 **Created:** 2026-11-06
 **Approved:** 2026-11-06 — option A.
 

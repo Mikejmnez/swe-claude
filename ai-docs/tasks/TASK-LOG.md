@@ -70,7 +70,7 @@ project, per machine — eight times over for four projects on two machines.
 ## TASK-002 — Branch rules when a project's records live in a separate repo
 
 **Category:** Documentation
-**Status:** In Progress
+**Status:** Done
 **Created:** 2026-11-06
 **Related requirements/constraints:** None found — swe-claude's own requirement and
 constraint docs hold only `_EXAMPLE_` entries. Origin: the "Branch discipline" open
