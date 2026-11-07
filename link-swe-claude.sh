@@ -3,22 +3,25 @@
 #
 # Usage: link-swe-claude.sh [-n] [-c FILE] TARGET_DIR
 #   -n        dry run: report what would happen, change nothing
-#   -c FILE   import this directory's FILE (default CLAUDE.md) into TARGET_DIR/CLAUDE.md,
-#             e.g. -c CLAUDE-myproject.md
+#   -c FILE   import this directory's FILE (default planning-rules.md) into
+#             TARGET_DIR/CLAUDE.md
 #
-# Links .claude from this directory into TARGET_DIR, imports this directory's CLAUDE
-# file into the project's own CLAUDE.md, and COPIES ai-docs and ai-plans (each project keeps its own requirements, ADRs, bugs, tasks
-# and plans, with its own ID sequences, committed in that project):
-#   ai-docs, ai-plans  copied from this directory when TARGET_DIR has none; a project
+# Links .claude from this directory into TARGET_DIR, imports this directory's
+# planning rules into the project's own CLAUDE.md, and COPIES ai-docs and ai-plans
+# from template/ (each project keeps its own requirements, ADRs, bugs, tasks and
+# plans, with its own ID sequences, committed in that project):
+#   ai-docs, ai-plans  copied from template/ when TARGET_DIR has none; a project
 #                      that already has its own is left alone; a link to this
 #                      directory (made by an older version) is replaced by a copy
 #   .claude            if TARGET_DIR already has one, report it and leave it alone
-#   CLAUDE.md          the project keeps its own; an '@~/.../CLAUDE.md' import line
-#                      is appended to it (or it is created holding just that line).
+#   CLAUDE.md          the project keeps its own; an '@~/.../planning-rules.md' import line
+#                      is appended to it. A project with none gets template/CLAUDE.md
+#                      (with {{...}} fields to fill in) and then the import line.
 #                      A CLAUDE.md that is a link here (made by an older version) is
 #                      removed and CLAUDE.md.orig, if any, is moved back first
-# The copies come from this directory's working tree: copy from a checkout of main,
-# whose ai-docs holds only the _EXAMPLE_ entries.
+# The copies come from template/ in this directory's working tree, which holds only
+# the _EXAMPLE_ entries and plan templates. The top-level ai-docs and ai-plans are
+# swe-claude's own records and are never copied.
 # Links made by older versions of this script (docs or ai-docs -> $SRC/docs, and
 # the same for plans) are removed.
 # If TARGET_DIR is in a git work tree, the .claude link is added to that repo's
@@ -52,7 +55,7 @@ is_our_link() { [ -L "$1" ] && [ "$(readlink "$1")" = "$SRC/$2" ]; }
 is_swe_link() { [ -L "$1" ] && case $(readlink "$1") in "$SRC"/*) true ;; *) false ;; esac; }
 
 dry_run=0
-claude_md=CLAUDE.md
+claude_md=planning-rules.md
 while getopts nc: opt; do
     case $opt in
         n) dry_run=1 ;;
@@ -138,8 +141,8 @@ for name in ai-docs ai-plans; do
         say "ok:   $name already exists in $TARGET; keeping the project's own copy"
         continue
     fi
-    say "copy: $SRC/$name -> $name"
-    run cp -R "$SRC/$name" "$path" || status=1
+    say "copy: $SRC/template/$name -> $name"
+    run cp -R "$SRC/template/$name" "$path" || status=1
 done
 
 # CLAUDE.md: the project keeps its own; swe-claude's rules come in through an
@@ -169,6 +172,10 @@ if [ -L "$c" ] && ! is_swe_link "$c"; then
 elif [ -n "$check" ] && [ -f "$check" ] && grep -qxF "$import_line" "$check"; then
     say "ok:   CLAUDE.md already imports $imp_path"
 else
+    if [ -z "$check" ] || [ ! -e "$check" ]; then
+        say "copy: $SRC/template/CLAUDE.md -> CLAUDE.md (fill in its {{...}} fields)"
+        run cp "$SRC/template/CLAUDE.md" "$c" || status=1
+    fi
     say "import: append $import_line to CLAUDE.md"
     if [ "$dry_run" -eq 0 ]; then
         {

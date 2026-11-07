@@ -1,5 +1,5 @@
-<!-- Paste the body below into CLAUDE.md in place of the {{CONVENTIONS}} placeholder,
-     and drop or demote this H2 so CLAUDE.md keeps a single `## Conventions` heading.
+<!-- Paste the body below into the project's own CLAUDE.md, in its Conventions
+     section, and drop or demote this H2 so CLAUDE.md keeps a single `## Conventions` heading.
      The per-file rules live in .claude/rules/latex.md. -->
 
 ## Conventions — LaTeX manuscript

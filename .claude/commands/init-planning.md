@@ -16,8 +16,8 @@ folded into an existing codebase.
 
 2. **Interview before writing anything**, in one message where possible, using
    structured questions where the answer is a choice:
-   - What is this project, in a sentence or two? (→ `{{ONE_LINE_DESCRIPTION}}` in
-     `CLAUDE.md`)
+   - What is this project, in a sentence or two? (→ the one-line description in the
+     project's `CLAUDE.md`)
    - What are the 3-8 most important things it must do right now? (→ seed `FR-###`
      entries — don't try to exhaustively capture everything in one pass)
    - Any hard non-functional targets already known — performance, security,
@@ -25,14 +25,17 @@ folded into an existing codebase.
    - Any hard constraints — things that must never be done, or technology/regulatory
      boundaries already fixed? (→ seed `IC-###` entries)
    - Language/stack, test command, branching convention — whatever a fresh Claude
-     session would otherwise have to rediscover. (→ `{{CONVENTIONS}}` in `CLAUDE.md`)
+     session would otherwise have to rediscover. (→ the Conventions section of the
+     project's `CLAUDE.md`)
 
    **Do not guess these from the code.** A codebase can suggest candidates worth
    asking about, but the requirement doc should reflect what the user confirms, not
    what looks plausible. Leave a field `TBD` rather than filling it with an inference.
 
-3. **Fill in `CLAUDE.md`**: `{{PROJECT_NAME}}`, `{{ONE_LINE_DESCRIPTION}}`,
-   `{{CONVENTIONS}}`.
+3. **Fill in the project's own `CLAUDE.md`**: its one-line description and its
+   Conventions section, replacing any `{{…}}` placeholders there. Leave the
+   swe-claude import line, and the `planning-rules.md` it imports, alone — those are
+   shared by every project.
 
 4. **Seed the requirement docs** with what the interview produced, following the
    existing table/section formats. Delete the `_EXAMPLE_` rows/sections in each file
