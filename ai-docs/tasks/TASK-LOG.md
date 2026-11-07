@@ -41,7 +41,7 @@ the last quarter that tests would have caught before merge.
 ## TASK-001 — Installer option to keep a project's records in a separate repo
 
 **Category:** Build/Tooling
-**Status:** In Progress
+**Status:** Done
 **Created:** 2026-11-06
 **Related requirements/constraints:** None found — swe-claude's own requirement and
 constraint docs hold only `_EXAMPLE_` entries
