@@ -58,12 +58,39 @@ and usage text, `README.md` and the `CLAUDE.md` layout table. Does not include
 creating the records repo, setting up any real project, or changing how the script
 behaves without `-r` beyond protecting exclude entries for symlinks.
 
-**Motivation:** pydap and oceanspy are public upstream repos, and the records of all
-four current projects (oceanspy, StirMix.jl, HillFunctions.jl, pydap) are to stay off
-GitHub while syncing between two machines. HillFunctions.jl and StirMix.jl have their own `.claude/` (holding `plans/` and
-`skills/` to keep), which the current installer refuses to touch, so neither would get
-the commands — oceanspy and pydap have none; and doing the layout by hand is six links plus their exclude lines,
-per project, per machine — eight times over for four projects on two machines.
+**Motivation:** two of the four current projects are public upstream repos, and the
+records of all four are to stay off GitHub while syncing between two machines. Two of
+them have their own `.claude/` (holding `plans/` and `skills/` to keep), which the
+current installer refuses to touch, so neither would get the commands — the other two
+have none; and doing the layout by hand is six links plus their exclude lines, per
+project, per machine — eight times over for four projects on two machines.
+
+---
+
+## TASK-002 — Branch rules when a project's records live in a separate repo
+
+**Category:** Documentation
+**Status:** Done
+**Created:** 2026-11-06
+**Related requirements/constraints:** None found — swe-claude's own requirement and
+constraint docs hold only `_EXAMPLE_` entries. Origin: the "Branch discipline" open
+question in `ai-plans/task-installer-records-mode-plan.md` (TASK-001).
+**Plan:** `ai-plans/task-records-repo-branch-rules-plan.md`
+
+**Scope:** Decide whether and how the "Branch & working-tree discipline" section of
+`planning-rules.md` applies when `link-swe-claude.sh -r` keeps a project's `ai-docs/`,
+`ai-plans/` and `CLAUDE.md` in a separate records repo — e.g. which repo's tree must be
+clean, whether record changes get a branch in the records repo, and when they are
+committed. Record the decision as an ADR and make the matching edit to
+`planning-rules.md` (and to the `/plan-task`, `/fix-bug`, `/plan-feature` commands only
+where they restate the branch rule). Does not include the other two TASK-001 open
+questions (`settings.json` under `-r`; moving a project's own `.claude/plans/` and
+`.claude/skills/`), changing `link-swe-claude.sh`, or setting up any real project.
+
+**Motivation:** Under `-r`, `planning-rules.md` as written puts record changes "on that
+item's branch" with the code, but the records are in another repo, so the rule as
+stated cannot be followed. TASK-001's plan says this should be decided before any
+real project is set up with `-r`.
 
 ---
 
