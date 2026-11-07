@@ -88,7 +88,8 @@ Before making any change for a plan, task, or bug — a new plan file, a BUG-LOG
 TASK-LOG entry, a work-log entry, or code — the working tree must be clean and the
 change must happen on its own branch, never directly on `main`. This applies
 uniformly to docs and code: drafting a plan, logging a bug/task, and implementing
-one all happen on that item's branch.
+one all happen on that item's branch. The one exception is a project whose records
+live in a separate repo — see the subsection below.
 
 - **Check first:** run `git status` before touching anything. If there are
   uncommitted edits, stop and ask the user whether to commit, stash, or discard
@@ -100,6 +101,29 @@ one all happen on that item's branch.
 - **Always ask before creating or switching branches** and confirm the name with
   the user first, even when the tree is clean — creating/switching branches
   changes shared git state, so it's never done silently.
+
+### When records live in a separate repo
+
+A project installed with `link-swe-claude.sh -r` keeps `ai-docs/`, `ai-plans/` and
+`CLAUDE.md` in a folder of a separate records repo, linked in and excluded from the
+project's git. **How to tell:** `ai-docs` in the project root is a symlink
+(`test -L ai-docs`). If it is not, nothing in this subsection applies.
+
+- **Find the records folder from the link, not the project's name:**
+  `rec=$(dirname "$(readlink ai-docs)")`; the records repo is
+  `git -C "$rec" rev-parse --show-toplevel`.
+- **Check both repos:** the project's `git status` cannot see the records, so also
+  run `git -C "$rec" status --short -- .` (scoped to this project's folder; other
+  projects sharing the repo don't count). Dirty in either → stop and ask, as above.
+  Also run `git -C "$rec" status -sb` and tell the user if the records repo is behind
+  its remote — don't pull.
+- **Branches:** code gets its own branch in the project, as above. Records stay on
+  the records repo's `main` — **never create or switch a branch in the records
+  repo**: it is shared by several projects, and a checkout there changes all of
+  their records at once.
+- **Commits:** record commits are made in the records repo, only when the user asks,
+  and name the project and the ID(s), plus the project branch if there is one:
+  `<project>: TASK-004 log and plan (mju/<slug>)`.
 
 ## Custom commands
 
