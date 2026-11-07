@@ -1,7 +1,7 @@
 # Task Plan: Installer option to keep a project's records in a separate repo
 
 **Task:** TASK-001
-**Status:** In Progress
+**Status:** Done
 **Created:** 2026-11-06
 **Resumed:** 2026-11-06 — project clean-up reported done; see *Current state of the
 four projects*. Approved 2026-11-06.
@@ -132,11 +132,14 @@ duplicate exclude lines), and check `git status --short` shows none of the six.
 Then once by hand: start `claude` in the Fresh scratch repo and confirm `/plan-task`
 is listed and can read `ai-docs/tasks/TASK-LOG.md` through the link. This is the only
 check that Claude Code follows symlinked command folders and edits through linked
-`ai-docs/`; it is currently an assumption.
+`ai-docs/`.
+
+**Manual check done (2026-11-06):** run by Miguel; `-r` works as expected — commands
+listed and linked `ai-docs/` readable through the link.
 
 ## Risks
 
-- **Claude Code and symlinks** (unverified): command folders linked one level inside
+- **Claude Code and symlinks** (checked by hand 2026-11-06, worked): command folders linked one level inside
   `.claude/`, and edits to `ai-docs/` whose real path is outside the project, may
   behave differently from the whole-`.claude` link, e.g. permission prompts for
   `Edit(./**)`. The manual check above catches it.
