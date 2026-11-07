@@ -38,6 +38,35 @@ the last quarter that tests would have caught before merge.
 
 ---
 
+## TASK-001 — Installer option to keep a project's records in a separate repo
+
+**Category:** Build/Tooling
+**Status:** Plan Ready
+**Created:** 2026-11-06
+**Related requirements/constraints:** None found — swe-claude's own requirement and
+constraint docs hold only `_EXAMPLE_` entries
+**Plan:** `ai-plans/task-installer-records-mode-plan.md`
+**Paused:** 2026-11-06 — plan not yet approved; the user is first cleaning up the
+four project directories. Resume with `/plan-task TASK-001`.
+
+**Scope:** A `-r DIR` option to `link-swe-claude.sh` that keeps the project's
+`ai-docs/`, `ai-plans/` and `CLAUDE.md` in `DIR` (one folder of a private records
+repo) and symlinks them into the project; links swe-claude's `.claude/` subfolders
+into the project's own `.claude/` rather than replacing it; and keeps every link out
+of the project's git without a later run undoing that. Includes the script's header
+and usage text, `README.md` and the `CLAUDE.md` layout table. Does not include
+creating the records repo, setting up any real project, or changing how the script
+behaves without `-r` beyond protecting exclude entries for symlinks.
+
+**Motivation:** pydap and oceanspy are public upstream repos, and the records of all
+four current projects (oceanspy, StirMix.jl, HillFunctions.jl, pydap) are to stay off
+GitHub while syncing between two machines. Every one of those projects already has
+its own `.claude/`, which the current installer refuses to touch, so none would get
+the commands; and doing the layout by hand is six links plus their exclude lines,
+per project, per machine — eight times over for four projects on two machines.
+
+---
+
 <!-- Add new tasks via /plan-task, or by hand — keep the section format: metadata
      lines, then Scope / Motivation. Unlike a bug, a task doesn't need a symptom or
      reproduction — it needs a clear boundary of what's included and what isn't,
